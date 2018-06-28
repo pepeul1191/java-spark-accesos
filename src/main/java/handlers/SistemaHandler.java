@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import configs.Database;
 import models.Sistema;
+import models.ViewSistemaModulo;
 
 public class SistemaHandler{
   public static Route listar = (Request request, Response response) -> {
@@ -111,6 +112,34 @@ public class SistemaHandler{
       response.status(500);
       rpta = rptaMensaje.toString();
       e.printStackTrace();
+    } finally {
+      db.close();
+    }
+    return rpta;
+  };
+
+  public static Route menuModulos = (Request request, Response response) -> {
+    String rpta = "";
+    int sistemaId = Integer.parseInt(request.params(":sistema_id"));
+    Database db = new Database();
+    try {
+      List<JSONObject> rptaTemp = new ArrayList<JSONObject>();
+      db.open();
+      List<ViewSistemaModulo> rptaList = ViewSistemaModulo.find("sistema_id = ?", sistemaId);
+      for (ViewSistemaModulo sistemaModulo : rptaList) {
+        JSONObject obj = new JSONObject();
+        obj.put("url", sistemaModulo.get("url"));
+        obj.put("nombre", sistemaModulo.get("nombre_modulo"));
+        rptaTemp.add(obj);
+      }
+      rpta = rptaTemp.toString();
+    }catch (Exception e) {
+      String[] error = {"Se ha producido un error en el menú de módulos del sistema", e.toString()};
+      JSONObject rptaTry = new JSONObject();
+      rptaTry.put("tipo_mensaje", "error");
+      rptaTry.put("mensaje", error);
+      rpta = rptaTry.toString();
+      response.status(500);
     } finally {
       db.close();
     }

@@ -89,6 +89,7 @@ public class App {
 		post("/sistema/guardar", SistemaHandler.guardar);
 		get("/modulo/listar/:sistema_id", ModuloHandler.listar);
 		post("/modulo/guardar", ModuloHandler.guardar);
+		get("/modulo/menu/:sistema_id", SistemaHandler.menuModulos);
 		get("/subtitulo/listar/:modulo_id", SubtituloHandler.listar);
 		post("/subtitulo/guardar", SubtituloHandler.guardar);
 		get("/item/listar/:subtitulo_id", ItemHandler.listar);

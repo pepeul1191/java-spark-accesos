@@ -161,7 +161,7 @@ public class ItemHandler{
       }
       rpta = items.toString();
     }catch (Exception e) {
-      String[] error = {"Se ha producido un error en  listar los items", e.toString()};
+      String[] error = {"Se ha producido un error en obtener el submenú del módulo", e.toString()};
       JSONObject rptaTry = new JSONObject();
       rptaTry.put("tipo_mensaje", "error");
       rptaTry.put("mensaje", error);
