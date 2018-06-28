@@ -43,8 +43,6 @@ public class PermisoHandler{
   public static Route guardar = (Request request, Response response) -> {
     String rpta = "";
     List<JSONObject> listJSONNuevos = new ArrayList<JSONObject>();
-    boolean error = false;
-    String execption = "";
     Database db = new Database();
     try {
       JSONObject data = new JSONObject(request.queryParams("data"));
@@ -96,23 +94,6 @@ public class PermisoHandler{
         }
       }
       db.getDb().commitTransaction();
-    }catch (Exception e) {
-      error = true;
-      e.printStackTrace();
-      execption = e.toString();
-    } finally {
-      if(db.getDb().hasConnection()){
-        db.close();
-      }
-    }
-    if(error){
-      String[] cuerpoMensaje = {"Se ha producido un error en  guardar los permisos del sitema", execption};
-      JSONObject rptaMensaje = new JSONObject();
-      rptaMensaje.put("tipo_mensaje", "error");
-      rptaMensaje.put("mensaje", cuerpoMensaje);
-      response.status(500);
-      rpta = rptaMensaje.toString();
-    }else{
       JSONArray cuerpoMensaje =  new JSONArray();
       cuerpoMensaje.put("Se ha registrado los cambios en los permisos del sitema");
       cuerpoMensaje.put(listJSONNuevos);
@@ -120,6 +101,18 @@ public class PermisoHandler{
       rptaMensaje.put("tipo_mensaje", "success");
       rptaMensaje.put("mensaje", cuerpoMensaje);
       rpta = rptaMensaje.toString();
+    }catch (Exception e) {
+      e.printStackTrace();
+      String[] cuerpoMensaje = {"Se ha producido un error en  guardar los permisos del sitema", e.toString()};
+      JSONObject rptaMensaje = new JSONObject();
+      rptaMensaje.put("tipo_mensaje", "error");
+      rptaMensaje.put("mensaje", cuerpoMensaje);
+      response.status(500);
+      rpta = rptaMensaje.toString();
+    } finally {
+      if(db.getDb().hasConnection()){
+        db.close();
+      }
     }
     return rpta;
   };

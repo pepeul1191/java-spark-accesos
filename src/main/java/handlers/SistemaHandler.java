@@ -43,8 +43,6 @@ public class SistemaHandler{
   public static Route guardar = (Request request, Response response) -> {
     String rpta = "";
     List<JSONObject> listJSONNuevos = new ArrayList<JSONObject>();
-    boolean error = false;
-    String execption = "";
     Database db = new Database();
     try {
       JSONObject data = new JSONObject(request.queryParams("data"));
@@ -98,21 +96,6 @@ public class SistemaHandler{
         }
       }
       db.getDb().commitTransaction();
-    }catch (Exception e) {
-      error = true;
-      e.printStackTrace();
-      execption = e.toString();
-    } finally {
-      db.close();
-    }
-    if(error){
-      String[] cuerpoMensaje = {"Se ha producido un error en  guardar los sistemas", execption};
-      JSONObject rptaMensaje = new JSONObject();
-      rptaMensaje.put("tipo_mensaje", "error");
-      rptaMensaje.put("mensaje", cuerpoMensaje);
-      response.status(500);
-      rpta = rptaMensaje.toString();
-    }else{
       JSONArray cuerpoMensaje =  new JSONArray();
       cuerpoMensaje.put("Se ha registrado los cambios en los sistemas");
       cuerpoMensaje.put(listJSONNuevos);
@@ -120,6 +103,16 @@ public class SistemaHandler{
       rptaMensaje.put("tipo_mensaje", "success");
       rptaMensaje.put("mensaje", cuerpoMensaje);
       rpta = rptaMensaje.toString();
+    }catch (Exception e) {
+      String[] cuerpoMensaje = {"Se ha producido un error en  guardar los sistemas", e.toString()};
+      JSONObject rptaMensaje = new JSONObject();
+      rptaMensaje.put("tipo_mensaje", "error");
+      rptaMensaje.put("mensaje", cuerpoMensaje);
+      response.status(500);
+      rpta = rptaMensaje.toString();
+      e.printStackTrace();
+    } finally {
+      db.close();
     }
     return rpta;
   };

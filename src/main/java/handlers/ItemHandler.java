@@ -44,8 +44,6 @@ public class ItemHandler{
   public static Route guardar = (Request request, Response response) -> {
     String rpta = "";
     List<JSONObject> listJSONNuevos = new ArrayList<JSONObject>();
-    boolean error = false;
-    String execption = "";
     Database db = new Database();
     try {
       JSONObject data = new JSONObject(request.queryParams("data"));
@@ -97,23 +95,6 @@ public class ItemHandler{
         }
       }
       db.getDb().commitTransaction();
-    }catch (Exception e) {
-      error = true;
-      e.printStackTrace();
-      execption = e.toString();
-    } finally {
-      if(db.getDb().hasConnection()){
-        db.close();
-      }
-    }
-    if(error){
-      String[] cuerpoMensaje = {"Se ha producido un error en  guardar los items del subtítulo", execption};
-      JSONObject rptaMensaje = new JSONObject();
-      rptaMensaje.put("tipo_mensaje", "error");
-      rptaMensaje.put("mensaje", cuerpoMensaje);
-      response.status(500);
-      rpta = rptaMensaje.toString();
-    }else{
       JSONArray cuerpoMensaje =  new JSONArray();
       cuerpoMensaje.put("Se ha registrado los cambios en los items del subtítulo");
       cuerpoMensaje.put(listJSONNuevos);
@@ -121,6 +102,18 @@ public class ItemHandler{
       rptaMensaje.put("tipo_mensaje", "success");
       rptaMensaje.put("mensaje", cuerpoMensaje);
       rpta = rptaMensaje.toString();
+    }catch (Exception e) {
+      e.printStackTrace();
+      String[] cuerpoMensaje = {"Se ha producido un error en  guardar los items del subtítulo", e.toString()};
+      JSONObject rptaMensaje = new JSONObject();
+      rptaMensaje.put("tipo_mensaje", "error");
+      rptaMensaje.put("mensaje", cuerpoMensaje);
+      response.status(500);
+      rpta = rptaMensaje.toString();
+    } finally {
+      if(db.getDb().hasConnection()){
+        db.close();
+      }
     }
     return rpta;
   };
@@ -154,7 +147,7 @@ public class ItemHandler{
         for (JSONObject obj : subtitulosTemp) {
           if(obj.getString("subtitulo").equalsIgnoreCase(subtitulo)){
             JSONObject temp = new JSONObject();
-            temp.put("item", obj.get("item"));
+            temp.put("item", obj.get("item")); 
             temp.put("url", obj.get("url"));
             for (JSONObject itemTemp : items) {
               if(subtitulo.equalsIgnoreCase(itemTemp.getString("subtitulo"))){
