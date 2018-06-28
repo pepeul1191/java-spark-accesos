@@ -92,6 +92,7 @@ public class App {
 		get("/subtitulo/listar/:modulo_id", SubtituloHandler.listar);
 		post("/subtitulo/guardar", SubtituloHandler.guardar);
 		get("/item/listar/:subtitulo_id", ItemHandler.listar);
+		get("/item/menu/:modulo_id", ItemHandler.menu);
 		post("/item/guardar", ItemHandler.guardar);
 		get("/permiso/listar/:sistema_id", PermisoHandler.listar);
 		post("/permiso/guardar", PermisoHandler.guardar);

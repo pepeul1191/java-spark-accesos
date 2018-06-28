@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import configs.Database;
 import models.Item;
+import models.ViewModuloSubtituloItem;;
 
 public class ItemHandler{
   public static Route listar = (Request request, Response response) -> {
@@ -120,6 +121,61 @@ public class ItemHandler{
       rptaMensaje.put("tipo_mensaje", "success");
       rptaMensaje.put("mensaje", cuerpoMensaje);
       rpta = rptaMensaje.toString();
+    }
+    return rpta;
+  };
+
+  public static Route menu = (Request request, Response response) -> {
+    String rpta = "";
+    int moduloId = Integer.parseInt(request.params(":modulo_id"));
+    Database db = new Database();
+    try {
+      List<JSONObject> subtitulosTemp = new ArrayList<JSONObject>();
+      db.open();
+      List<ViewModuloSubtituloItem> rptaList = ViewModuloSubtituloItem.find("modulo_id = ?", moduloId);
+      List<String> subtitulos = new ArrayList<String>();
+      List<JSONObject> items = new ArrayList<JSONObject>();
+      for (ViewModuloSubtituloItem temp : rptaList) {
+        String subtitulo = temp.getString("subtitulo");
+        if(subtitulos.contains(subtitulo) == false){
+          subtitulos.add(subtitulo);
+          JSONObject obj = new JSONObject();
+          obj.put("subtitulo", subtitulo);
+          obj.put("items", new ArrayList<JSONObject>());
+          items.add(obj);
+        }
+        JSONObject obj = new JSONObject();
+        obj.put("subtitulo", temp.get("subtitulo"));
+        obj.put("item", temp.get("item"));
+        obj.put("url", temp.get("url_item"));
+        subtitulosTemp.add(obj);
+      }
+      for (String subtitulo : subtitulos) {
+        for (JSONObject obj : subtitulosTemp) {
+          if(obj.getString("subtitulo").equalsIgnoreCase(subtitulo)){
+            JSONObject temp = new JSONObject();
+            temp.put("item", obj.get("item"));
+            temp.put("url", obj.get("url"));
+            for (JSONObject itemTemp : items) {
+              if(subtitulo.equalsIgnoreCase(itemTemp.getString("subtitulo"))){
+                JSONArray itemsArray = itemTemp.getJSONArray("items");
+                itemsArray.put(temp);
+                itemTemp.put("items", itemsArray); 
+              }
+            }
+          }
+        }
+      }
+      rpta = items.toString();
+    }catch (Exception e) {
+      String[] error = {"Se ha producido un error en  listar los items", e.toString()};
+      JSONObject rptaTry = new JSONObject();
+      rptaTry.put("tipo_mensaje", "error");
+      rptaTry.put("mensaje", error);
+      rpta = rptaTry.toString();
+      response.status(500);
+    } finally {
+      db.close();
     }
     return rpta;
   };

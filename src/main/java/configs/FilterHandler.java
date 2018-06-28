@@ -51,7 +51,7 @@ public class FilterHandler{
         rptaJSON.put("tipo_mensaje", "error");
         rptaJSON.put("mensaje", error);
         String rpta = rptaJSON.toString();
-        halt(401, rpta);
+        halt(500, rpta);
       }      
     }
   };
