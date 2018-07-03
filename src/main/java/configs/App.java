@@ -87,13 +87,12 @@ public class App {
 		//rutas de servicios REST a handlers
 		get("/sistema/listar", SistemaHandler.listar);
 		post("/sistema/guardar", SistemaHandler.guardar);
+		post("/sistema/usuario/validar", SistemaHandler.existeUsuario);
 		get("/modulo/listar/:sistema_id", ModuloHandler.listar);
 		post("/modulo/guardar", ModuloHandler.guardar);
-		get("/modulo/menu/:sistema_id", SistemaHandler.menuModulos);
 		get("/subtitulo/listar/:modulo_id", SubtituloHandler.listar);
 		post("/subtitulo/guardar", SubtituloHandler.guardar);
 		get("/item/listar/:subtitulo_id", ItemHandler.listar);
-		get("/item/menu/:modulo_id", ItemHandler.menu);
 		post("/item/guardar", ItemHandler.guardar);
 		get("/permiso/listar/:sistema_id", PermisoHandler.listar);
 		post("/permiso/guardar", PermisoHandler.guardar);
@@ -110,12 +109,16 @@ public class App {
 		post("/usuario/guardar_usuario_correo", UsuarioHandler.guardarUsuarioCorreo);
 		post("/usuario/guardar_contrasenia", UsuarioHandler.guardarContrasenia);
 		post("/usuario/validar", UsuarioHandler.validar);
+		post("/usuario/externo/validar", UsuarioHandler.validarREST);
 		get("/usuario/sistema/:usuario_id", UsuarioHandler.listarSistemas);
 		post("/usuario/sistema/guardar", UsuarioHandler.guardarSistemas);
 		get("/usuario/rol/:sistema_id/:usuario_id", UsuarioHandler.listarUsuarioSistemaRoles);
 		post("/usuario/rol/guardar", UsuarioHandler.guardarSistemaRoles);
 		get("/usuario/permiso/:sistema_id/:usuario_id", UsuarioHandler.listarUsuarioSistemaPermisos);
 		post("/usuario/permiso/guardar", UsuarioHandler.guardarSistemaPermisos);
+		//rutas de servicios REST a handlers de menú de módulos e items
+		get("/modulo/menu/:sistema_id", SistemaHandler.menuModulos);
+		get("/item/menu", ItemHandler.menu);
 		//errors si no encuentra recurso
 		get("/*", ErrorHandler.errorGET);
 		post("/*", ErrorHandler.errorPOST);

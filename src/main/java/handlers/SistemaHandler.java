@@ -10,6 +10,7 @@ import java.util.List;
 import configs.Database;
 import models.Sistema;
 import models.ViewSistemaModulo;
+import models.ViewUsuarioSistema;
 
 public class SistemaHandler{
   public static Route listar = (Request request, Response response) -> {
@@ -135,6 +136,34 @@ public class SistemaHandler{
       rpta = rptaTemp.toString();
     }catch (Exception e) {
       String[] error = {"Se ha producido un error en el menú de módulos del sistema", e.toString()};
+      JSONObject rptaTry = new JSONObject();
+      rptaTry.put("tipo_mensaje", "error");
+      rptaTry.put("mensaje", error);
+      rpta = rptaTry.toString();
+      response.status(500);
+    } finally {
+      db.close();
+    }
+    return rpta;
+  };
+
+  public static Route existeUsuario = (Request request, Response response) -> {
+    String rpta = "";
+    Database db = new Database();
+    try {
+      String usuario = request.queryParams("usuario");
+      String sistemaId = request.queryParams("sistema_id");
+      db.open();
+      System.out.println("1A +++++++++++++++++++++++++++++++++++++++");
+      System.out.println(request.body());
+      System.out.println(request.uri());
+      System.out.println(usuario);
+      System.out.println(sistemaId);
+      System.out.println("2A +++++++++++++++++++++++++++++++++++++++");
+      rpta = ViewUsuarioSistema.count("usuario = ? AND id = ?", usuario, sistemaId) + "";
+    }catch (Exception e) {
+      e.printStackTrace();
+      String[] error = {"Se ha producido un error en validar si el usuario tiene acceso a dicho sistema", e.toString()};
       JSONObject rptaTry = new JSONObject();
       rptaTry.put("tipo_mensaje", "error");
       rptaTry.put("mensaje", error);

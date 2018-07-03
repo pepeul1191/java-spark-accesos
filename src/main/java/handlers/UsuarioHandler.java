@@ -7,6 +7,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import configs.Database;
 import models.Usuario;
 import models.Acceso;
@@ -21,28 +23,85 @@ import models.ViewUsuarioPermiso;
 public class UsuarioHandler{
   public static Route validar = (Request request, Response response) -> {
     String rpta = "";
+    boolean continuar = true;
+    String[] error = new String[2];
     Database db = new Database();
     try {
-      String usuario = request.queryParams("usuario");
-      String contrasenia = request.queryParams("contrasenia");
-      db.open();
-      rpta = Usuario.count("usuario = ? AND contrasenia = ?", usuario, contrasenia) + "";
-      if (rpta.equalsIgnoreCase("1")){
-        //guardar acceso
-        Usuario u = Usuario.findFirst("usuario = ? AND contrasenia = ?", usuario, contrasenia);
-        if(u != null){
-          int usuarioId = u.getInteger("id");
-          Acceso n = new Acceso();
-          java.util.Date utilDate = new java.util.Date();
-          java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
-          n.set("momento", sqlDate);
-          n.set("usuario_id", usuarioId);
-          n.saveIt();
+      Config constants = ConfigFactory.parseResources("configs/application.conf");
+      if(constants.getString("ambiente_csrf").equalsIgnoreCase("activo")){
+        String csrfKey = constants.getString("csrf.key");
+        String csrfValue = constants.getString("csrf.secret");
+        String csrfRequestValue = request.headers(csrfKey);
+        if(!csrfRequestValue.equalsIgnoreCase(csrfValue) ){
+          error[0] = "No se puede acceder al recurso"; 
+          error[1] = "CSRF Token error";
+          continuar = false;
         }
       }
+      if(continuar == true){
+        String usuario = request.queryParams("usuario");
+        String contrasenia = request.queryParams("contrasenia");
+        db.open();
+        rpta = Usuario.count("usuario = ? AND contrasenia = ?", usuario, contrasenia) + "";
+        if (rpta.equalsIgnoreCase("1")){
+          //guardar acceso
+          Usuario u = Usuario.findFirst("usuario = ? AND contrasenia = ?", usuario, contrasenia);
+          if(u != null){
+            int usuarioId = u.getInteger("id");
+            Acceso n = new Acceso();
+            java.util.Date utilDate = new java.util.Date();
+            java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
+            n.set("momento", sqlDate);
+            n.set("usuario_id", usuarioId);
+            n.saveIt();
+          }
+        }
+      }else{
+        JSONObject rptaTry = new JSONObject();
+        rptaTry.put("tipo_mensaje", "error");
+        rptaTry.put("mensaje", error);
+        rpta = rptaTry.toString();
+        response.status(500);
+      }
+    }catch(NullPointerException e){
+      e.printStackTrace();
+      error[0] = "CSRF Token key error"; 
+      error[1] = "CSRF no presente en el form del POST";
+      JSONObject rptaTry = new JSONObject();
+      rptaTry.put("tipo_mensaje", "error");
+      rptaTry.put("mensaje", error);
+      rpta = rptaTry.toString();
+      response.status(500);
     }catch (Exception e) {
       e.printStackTrace();
-      String[] error = {"Se ha producido un error en validar al usuario", e.toString()};
+      error[0] = "Se ha producido un error en validar al usuario"; 
+      error[1] = e.toString();
+      JSONObject rptaTry = new JSONObject();
+      rptaTry.put("tipo_mensaje", "error");
+      rptaTry.put("mensaje", error);
+      rpta = rptaTry.toString();
+      response.status(500);
+    } finally {
+      db.close();
+    }
+    return rpta;
+  };
+
+  public static Route validarREST = (Request request, Response response) -> {
+    String rpta = "";
+    String usuario = request.queryParams("usuario");
+    String contrasenia = request.queryParams("contrasenia");
+    System.out.println("1B +++++++++++++++++++++++++++++++++++++++");
+    System.out.println(request.body());
+    System.out.println(usuario);
+    System.out.println(contrasenia);
+    System.out.println("2B +++++++++++++++++++++++++++++++++++++++");
+    Database db = new Database();
+    try {
+      db.open();
+      rpta = Usuario.count("usuario = ? AND contrasenia = ?", usuario, contrasenia) + "";
+    }catch (Exception e) {
+      String[] error = {"Se ha producido un error en obtener validar el usuario y correo", e.toString()};
       JSONObject rptaTry = new JSONObject();
       rptaTry.put("tipo_mensaje", "error");
       rptaTry.put("mensaje", error);

@@ -120,12 +120,13 @@ public class ItemHandler{
 
   public static Route menu = (Request request, Response response) -> {
     String rpta = "";
-    int moduloId = Integer.parseInt(request.params(":modulo_id"));
     Database db = new Database();
     try {
+      String sistemaId = request.queryParams("sistema_id");
+      String moduloNombre = request.queryParams("modulo");
       List<JSONObject> subtitulosTemp = new ArrayList<JSONObject>();
       db.open();
-      List<ViewModuloSubtituloItem> rptaList = ViewModuloSubtituloItem.find("modulo_id = ?", moduloId);
+      List<ViewModuloSubtituloItem> rptaList = ViewModuloSubtituloItem.find("sistema_id = ? AND modulo = ?", sistemaId, moduloNombre);
       List<String> subtitulos = new ArrayList<String>();
       List<JSONObject> items = new ArrayList<JSONObject>();
       for (ViewModuloSubtituloItem temp : rptaList) {
