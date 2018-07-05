@@ -126,7 +126,7 @@ public class App {
 
   public static String renderTemplate(String template, Map model) {
 		//usar velocity como motor de templates
-    Config constants = ConfigFactory.parseResources("configs/application.conf");
+    Config constants = ConfigFactory.defaultApplication();
 		model.put("constants", constants);
 		VelocityTemplateEngine vt = new VelocityTemplateEngine();
 		ModelAndView mv = new ModelAndView(model, template);		

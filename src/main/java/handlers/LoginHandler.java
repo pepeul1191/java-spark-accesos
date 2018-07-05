@@ -13,7 +13,7 @@ import helpers.LoginHelper;
 public class LoginHandler {
   public static Route index = (Request request, Response response) -> {
     LoginHelper helper = new LoginHelper();
-    Config constants = ConfigFactory.parseResources("configs/application.conf");
+    Config constants = ConfigFactory.defaultApplication();
     Map<String, Object> model = new HashMap<>();
     model.put("partial", "templates/login/index.vm");
     model.put("title", "Bienvenido");
@@ -25,7 +25,7 @@ public class LoginHandler {
   };
 
   public static Route acceder = (Request request, Response response) -> {
-    Config constants = ConfigFactory.parseResources("configs/application.conf");
+    Config constants = ConfigFactory.defaultApplication();
     String csrfKey = constants.getString("csrf.key");
     String csrfValue = constants.getString("csrf.secret");
     boolean continuar = true;
@@ -79,7 +79,7 @@ public class LoginHandler {
     }catch(NullPointerException e){
       //e.printStackTrace();
     }
-    Config constants = ConfigFactory.parseResources("configs/application.conf");
+    Config constants = ConfigFactory.defaultApplication();
     String baseURL = constants.getString("base_url");
     response.redirect(baseURL + "login");
     return "";

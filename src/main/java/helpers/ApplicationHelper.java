@@ -4,7 +4,7 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
 public abstract class ApplicationHelper {
-  private Config constants = ConfigFactory.parseResources("configs/application.conf");
+  private Config constants = ConfigFactory.defaultApplication();
   
   public String getConfValue(String key){
     return constants.getString(key);

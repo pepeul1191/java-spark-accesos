@@ -20,14 +20,14 @@ public class FilterHandler{
   };
 
   public static Filter ambinteLogs = (Request request, Response response) -> {
-    Config constants = ConfigFactory.parseResources("configs/application.conf");
+    Config constants = ConfigFactory.defaultApplication();
     if(constants.getString("ambiente_request_logs").equalsIgnoreCase("activo")){
       System.out.println(request.requestMethod() + " - " + request.pathInfo());
     }
   };
 
   public static Filter ambienteCSRF = (Request request, Response response) -> {
-    Config constants = ConfigFactory.parseResources("configs/application.conf");
+    Config constants = ConfigFactory.defaultApplication();
     if(constants.getString("ambiente_csrf").equalsIgnoreCase("activo")){
       String csrfKey = constants.getString("csrf.key");
       String csrfValue = constants.getString("csrf.secret");
@@ -57,7 +57,7 @@ public class FilterHandler{
   };
 
   public static Filter sessionTrue = (Request request, Response response) -> {
-    Config constants = ConfigFactory.parseResources("configs/application.conf");
+    Config constants = ConfigFactory.defaultApplication();
     if(constants.getString("ambiente_session").equalsIgnoreCase("activo")){
       boolean error = false;
       request.session(true);
@@ -77,7 +77,7 @@ public class FilterHandler{
   };
 
   public static Filter sessionFalse = (Request request, Response response) -> {
-    Config constants = ConfigFactory.parseResources("configs/application.conf");
+    Config constants = ConfigFactory.defaultApplication();
     if(constants.getString("ambiente_session").equalsIgnoreCase("activo")){
       boolean error = false;
       request.session(true);

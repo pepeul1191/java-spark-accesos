@@ -27,7 +27,7 @@ public class UsuarioHandler{
     String[] error = new String[2];
     Database db = new Database();
     try {
-      Config constants = ConfigFactory.parseResources("configs/application.conf");
+      Config constants = ConfigFactory.defaultApplication();
       if(constants.getString("ambiente_csrf").equalsIgnoreCase("activo")){
         String csrfKey = constants.getString("csrf.key");
         String csrfValue = constants.getString("csrf.secret");

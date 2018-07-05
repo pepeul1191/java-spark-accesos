@@ -14,7 +14,7 @@ import helpers.ErrorHelper;
 public class ErrorHandler {
   public static Route index = (Request request, Response response) -> {
     ErrorHelper helper = new ErrorHelper();
-    Config constants = ConfigFactory.parseResources("configs/application.conf");
+    Config constants = ConfigFactory.defaultApplication();
     int numeroError = Integer.parseInt(request.params(":error"));
     String numero = "";
     String mensaje = "";

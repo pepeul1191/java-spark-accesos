@@ -17,7 +17,7 @@ public class Database{
   }
 
   public void open() throws DBException{
-    Config constants = ConfigFactory.parseResources("configs/application.conf");
+    Config constants = ConfigFactory.defaultApplication();
     String driver = constants.getString("database.driver");
     String url = constants.getString("database.url");
     String user = constants.getString("database.user");
